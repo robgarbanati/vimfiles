@@ -18,8 +18,9 @@ set foldnestmax=1
 set splitright          " all vertical splits open to the right
 "set colorcolumn=120
 
-"set guioptions-=r
-"set guioptions-=L
+"remove all scroll bars
+set guioptions-=r
+set guioptions-=L
 
 " slash-slash to search for visual selection, h/t http://vim.wikia.com/wiki/Search_for_visually_selected_text
 vnorem // y/<c-r>"<cr>
@@ -33,6 +34,17 @@ map <C-k> <C-w>k
 map <C-h> <C-w>h
 map <C-l> <C-w>l
 
+" No arrow keys allowed
+noremap <Up> <NOP>
+noremap <Down> <NOP>
+noremap <Left> <NOP>
+noremap <Right> <NOP>
+
+" But I like navigating in insert mode
+inoremap <C-h> <C-o>h
+inoremap <C-j> <C-o>j
+inoremap <C-k> <C-o>k
+inoremap <C-l> <C-o>l
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGINS
@@ -47,7 +59,9 @@ Plug 'kshenoy/vim-signature'
 
 " autocompletion / snippets
 Plug 'Valloric/YouCompleteMe', { 'do': './install.sh' }
-Plug 'jiangmiao/auto-pairs'
+"Plug 'jiangmiao/auto-pairs'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets' " snippet library
 
 " Git
 Plug 'tpope/vim-fugitive'
@@ -55,39 +69,33 @@ Plug 'airblade/vim-gitgutter'
 
 " Vim enhancements
 Plug 'scrooloose/syntastic'
-Plug 'tomtom/tcomment_vim'
 Plug 'terryma/vim-multiple-cursors'
 Plug 'scrooloose/nerdcommenter'
 
 " Appearance
 Plug 'altercation/vim-colors-solarized'
 
+" Man page navigation
+"Plug 'bruno-/vim-man'
+
 " Language specific
-"Plug 'burnettk/vim-angular'
-"Plug 'evidens/vim-twig'
-"Plug 'klen/python-mode'
-"Plug 'fisadev/vim-isort'
-"Plug 'fatih/vim-go'
-"Plug 'saltstack/salt-vim'
+Plug 'burnettk/vim-angular'
+Plug 'evidens/vim-twig'
+Plug 'klen/python-mode'
+Plug 'fisadev/vim-isort'
+Plug 'fatih/vim-go'
+Plug 'saltstack/salt-vim'
+
 
 call plug#end()
 
 " Testing
 set completeopt=longest,menuone,preview
 
-" Solarized
-let g:solarized_termtrans = 1
-set background=dark
-colorscheme solarized
-
 " NERDTree
 :command NT NERDTreeToggle
 :command NTF NERDTreeFind
 let NERDTreeIgnore = ['\.pyc$']
-
-" Remap tcomment toggle
-"nmap <D-/> gcc
-"vmap <D-/> gcc
 
 " gitgutter
 highlight clear SignColumn
@@ -105,6 +113,15 @@ let g:pymode_folding = 0
 let g:pymode_rope = 0
 let g:pymode_lint_checkers = ['flake8', 'mccabe']
 
+" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
+let g:UltiSnipsExpandTrigger="<S-Enter>"
+"let g:UltiSnipsJumpForwardTrigger="<C-b>"
+let g:UltiSnipsJumpForwardTrigger="<C-k>"
+"let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+let g:UltiSnipsJumpBackwardTrigger="<C-j>"
+
+" If you want :UltiSnipsEdit to split your window.
+let g:UltiSnipsEditSplit="vertical"
 " Create Blank Newlines and stay in Normal mode
 nnoremap <C-j> o<Esc>
 nnoremap <C-k> O<Esc>
@@ -153,7 +170,7 @@ if has("gui_running")
     " Remove Toolbar
     set guioptions-=T
     "Consolas is wussup
-    set guifont=Consolas\ 16
+    set guifont=Consolas\ 9
 else
     set t_Co=256
     colorscheme jellybean
@@ -235,9 +252,17 @@ let Tlist_Enable_Fold_Column = 0
 let Tlist_Exit_OnlyWindow = 1
 let Tlist_Use_SingleClick = 1
 let Tlist_Inc_Winwidth = 0
-"
+
+" Properly display man pages
+" ==========================
+runtime ftplugin/man.vim
+if has("gui_running")
+	nnoremap K :<C-U>exe "Man" v:count "<C-R><C-W>"<CR>
+endif
 
 filetype plugin indent on
 syntax on
+
+autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 
 :set tags=./tags,./../tags,./../../tags,./../../../tags,tags
